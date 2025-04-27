@@ -37,15 +37,15 @@ export interface NativeEvent {
 }
 
 export interface SelectableTextProps {
-  value: string;
-  onSelection: (args: {
+  value?: string;
+  onSelection?: (args: {
     eventType: string;
     content: string;
     selectionStart: number;
     selectionEnd: number;
   }) => void;
   prependToChild?: ReactNode;
-  menuItems: string[];
+  menuItems?: string[];
   highlights?: Array<IHighlights>;
   highlightColor?: ColorValue;
   style?: StyleProp<TextStyle>;
@@ -54,7 +54,22 @@ export interface SelectableTextProps {
   TextComponent?: React.ComponentType<any>;
   textValueProp?: string;
   textComponentProps?: TextProps | TextInputProps;
+  children?: ReactNode;
 }
+
+// Utility function to extract text from React children
+const extractTextFromChildren = (children: ReactNode): string => {
+  if (typeof children === 'string') {
+    return children;
+  }
+  if (Array.isArray(children)) {
+    return children.map(extractTextFromChildren).join('');
+  }
+  if (React.isValidElement(children)) {
+    return extractTextFromChildren(children.props.children);
+  }
+  return '';
+};
 
 const combineHighlights = memoize((numbers: IHighlights[]) => {
   return numbers
@@ -127,6 +142,7 @@ export const SelectableText = ({
   TextComponent,
   textComponentProps,
   prependToChild,
+  children,
   ...props
 }: SelectableTextProps) => {
   const TX = (TextComponent || Text) as React.ComponentType<any>;
@@ -137,11 +153,14 @@ export const SelectableText = ({
     onSelection && onSelection(nativeEvent);
   };
 
-  let textValue: any = value;
-  if (TextComponent === Text || !TextComponent) {
+  // Extract text from children if provided, otherwise use value
+  const effectiveValue = children ? extractTextFromChildren(children) : value || '';
+
+  let textValue: any = effectiveValue;
+  if (!children && (TextComponent === Text || !TextComponent)) {
     textValue = (
       props.highlights && props.highlights.length > 0
-        ? mapHighlightsRanges(value, props.highlights).map(
+        ? mapHighlightsRanges(effectiveValue, props.highlights).map(
             ({ id, isHighlight, text, color }) => (
               <Text
                 key={`${id}-${text}-${Math.random()}`}
@@ -164,7 +183,7 @@ export const SelectableText = ({
               </Text>
             )
           )
-        : [value]
+        : [effectiveValue]
     );
     if (props.appendToChildren) {
       textValue.push(props.appendToChildren);
@@ -180,9 +199,13 @@ export const SelectableText = ({
       {...props}
       selectable={true}
       onSelection={onSelectionNative}
-      value={value}
+      value={effectiveValue} // Pass extracted text or value to native component
     >
-      <TX {...{ [textValueProp]: textValue, ...textComponentProps }} />
+      {children ? (
+        children // Render children for styling
+      ) : (
+        <TX {...{ [textValueProp]: textValue, ...textComponentProps }} />
+      )}
     </RNSelectableText>
   );
 };

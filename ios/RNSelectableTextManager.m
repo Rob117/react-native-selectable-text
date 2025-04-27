@@ -5,18 +5,16 @@
 
 RCT_EXPORT_MODULE()
 
-- (UIView *)view
-{
-    RNSelectableTextView *selectable = [[RNSelectableTextView alloc] initWithBridge:self.bridge];
-    return selectable;
+- (UIView *)view {
+    return [[RNSelectableTextView alloc] initWithBridge:self.bridge];
 }
 
+RCT_EXPORT_VIEW_PROPERTY(value, NSString)
 RCT_EXPORT_VIEW_PROPERTY(onSelection, RCTDirectEventBlock)
-RCT_EXPORT_VIEW_PROPERTY(menuItems, NSArray);
-RCT_EXPORT_VIEW_PROPERTY(value, NSString);
+RCT_EXPORT_VIEW_PROPERTY(menuItems, NSArray)
+RCT_EXPORT_VIEW_PROPERTY(highlights, NSArray)
+RCT_EXPORT_VIEW_PROPERTY(highlightColor, UIColor)
 RCT_EXPORT_VIEW_PROPERTY(onHighlightPress, RCTDirectEventBlock)
-
-#pragma mark - Multiline <TextInput> (aka TextView) specific properties
 
 #if !TARGET_OS_TV
 RCT_REMAP_VIEW_PROPERTY(dataDetectorTypes, backedTextInputView.dataDetectorTypes, UIDataDetectorTypes)

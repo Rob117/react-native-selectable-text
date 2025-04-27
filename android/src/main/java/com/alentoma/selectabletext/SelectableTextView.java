@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import android.view.ActionMode;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,9 +15,6 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SelectableTextView extends FrameLayout {
     private final TextView textView;
@@ -31,6 +29,12 @@ public class SelectableTextView extends FrameLayout {
 
     public void setText(String text) {
         textView.setText(text);
+        // Hide textView if child views are present to avoid visual overlap
+        if (getChildCount() > 1) {
+            textView.setVisibility(View.GONE);
+        } else {
+            textView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void setMenuItems(@Nullable String[] items) {
