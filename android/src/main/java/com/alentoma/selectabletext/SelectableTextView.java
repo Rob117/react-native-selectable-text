@@ -7,6 +7,7 @@ import android.view.ActionMode;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.view.View;
+import android.graphics.Color; // Import for setting transparent color
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,17 +25,15 @@ public class SelectableTextView extends FrameLayout {
         super(context);
         textView = new TextView(context);
         textView.setTextIsSelectable(true); // Enable text selection
+        textView.setTextColor(Color.TRANSPARENT); // Make text visually transparent
+        textView.setBackgroundColor(Color.TRANSPARENT); // Ensure background is transparent
         addView(textView);
     }
 
     public void setText(String text) {
         textView.setText(text);
-        // Hide textView if child views are present to avoid visual overlap
-        if (getChildCount() > 1) {
-            textView.setVisibility(View.GONE);
-        } else {
-            textView.setVisibility(View.VISIBLE);
-        }
+        // Keep textView visible for selection purposes
+        textView.setVisibility(View.VISIBLE);
     }
 
     public void setMenuItems(@Nullable String[] items) {
@@ -91,5 +90,14 @@ public class SelectableTextView extends FrameLayout {
                 "topSelection",
                 event
         );
+    }
+
+    @Override
+    public void addView(View child, int index) {
+        super.addView(child, index);
+        // Ensure textView remains the first child for selection
+        if (child != textView) {
+            bringChildToFront(textView);
+        }
     }
 }
