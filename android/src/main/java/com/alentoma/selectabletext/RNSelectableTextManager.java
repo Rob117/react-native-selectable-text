@@ -33,22 +33,24 @@ public class RNSelectableTextManager extends ReactTextViewManager {
     }
 
     @Override
-    public ReactTextView createViewInstance(ThemedReactContext context) {
-        return new ReactTextView(context);
+    public SelectableTextWrapperView createViewInstance(ThemedReactContext context) {
+        return new SelectableTextWrapperView(context);
     }
 
 
     @ReactProp(name = "menuItems")
-    public void setMenuItems(ReactTextView textView, ReadableArray items) {
+    public void setMenuItems(SelectableTextWrapperView wrapperView, ReadableArray items) {
+        ReactTextView textView = wrapperView.getTextView();
         List<String> result = new ArrayList<String>(items.size());
         for (int i = 0; i < items.size(); i++) {
             result.add(items.getString(i));
         }
 
-        registerSelectionListener(result.toArray(new String[items.size()]), textView);
+        registerSelectionListener(result.toArray(new String[items.size()]), wrapperView);
     }
 
-    public void registerSelectionListener(final String[] menuItems, final ReactTextView view) {
+    public void registerSelectionListener(final String[] menuItems, final SelectableTextWrapperView wrapperView) {
+        final ReactTextView view = wrapperView.getTextView();
         view.setCustomSelectionActionModeCallback(new Callback() {
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
