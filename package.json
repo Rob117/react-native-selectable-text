@@ -1,6 +1,6 @@
 {
   "name": "@rob117/react-native-selectable-text",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "type": "module",
   "description": "A library for custom text selection menus",
   "main": "./lib/module/index.js",
